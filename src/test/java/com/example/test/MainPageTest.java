@@ -40,41 +40,32 @@ public class MainPageTest {
         );
 
         try {
-            Thread.sleep(4000);
+            Thread.sleep(1000);
         } catch (InterruptedException ie) {
         }
     }
 
     @AfterEach
     public void tearDown() {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException ie) {
+        }
         driver.quit();
     }
 
     @Test
     public void createSingleGeometryPolygon() {
-
         mainPage.singleGeometryPolygonTab.click();
         drawCoordinates(offsets);
         dragCoordinate(offsets);
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException ie) {
-        }
     }
 
     @Test
     public void createMultiGeometryPolygon() {
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException ie) {
-        }
         mainPage.multiGeometryPolygonTab.click();
         drawCoordinates(offsets);
         dragCoordinate(offsets);
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException ie) {
-        }
     }
 
     private void dragCoordinate(List<Integer> offsets) {
@@ -85,10 +76,7 @@ public class MainPageTest {
                 .clickAndHold();
 
         moveCursor(actions);
-
-        actions.release()
-                .build()
-                .perform();
+        actions.release().build().perform();
     }
 
     private void moveCursor(Actions actions) {
@@ -105,12 +93,24 @@ public class MainPageTest {
 
     private void drawCoordinates(List<Integer> coordinates) {
         Actions actions = new Actions(driver);
+        int coordsMultiplyBy = 6;
         for (int i = 0; i < coordinates.size(); i += 2) {
             actions
                     .moveByOffset(coordinates.get(i), coordinates.get(i + 1))
                     .click();
+            addCoordinatesInBetween(i, coordinates, coordsMultiplyBy, actions);
         }
         actions.build().perform();
+    }
+
+    private void addCoordinatesInBetween(int i, List<Integer> coordinates, int coordsMultiplyBy, Actions actions) {
+        if (i + 2 < coordinates.size()) {
+            int x = coordinates.get(i + 2) / coordsMultiplyBy;
+            int y = coordinates.get(i + 3) / coordsMultiplyBy;
+            for (int j = 0; j < coordsMultiplyBy; j++) {
+                actions.moveByOffset(x, y).click();
+            }
+        }
     }
 
 }
