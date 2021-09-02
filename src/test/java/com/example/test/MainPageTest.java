@@ -38,6 +38,11 @@ public class MainPageTest {
                 -100, -50,
                 -10, -100
         );
+
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException ie) {
+        }
     }
 
     @AfterEach
@@ -47,7 +52,23 @@ public class MainPageTest {
 
     @Test
     public void createSingleGeometryPolygon() {
+
         mainPage.singleGeometryPolygonTab.click();
+        drawCoordinates(offsets);
+        dragCoordinate(offsets);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ie) {
+        }
+    }
+
+    @Test
+    public void createMultiGeometryPolygon() {
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException ie) {
+        }
+        mainPage.multiGeometryPolygonTab.click();
         drawCoordinates(offsets);
         dragCoordinate(offsets);
         try {
@@ -57,17 +78,29 @@ public class MainPageTest {
     }
 
     private void dragCoordinate(List<Integer> offsets) {
-        new Actions(driver)
+        Actions actions = new Actions(driver)
                 .moveToElement(mainPage.singleGeometryPolygonTab)
                 .moveByOffset(-5, 105)
                 .click()
-                .clickAndHold()
-                .moveByOffset(300, 0)
-                .moveByOffset(-200, 200)
-                .moveByOffset(-100, -200)
-                .release()
+                .clickAndHold();
+
+        moveCursor(actions);
+
+        actions.release()
                 .build()
                 .perform();
+    }
+
+    private void moveCursor(Actions actions) {
+        int xOffset = 300;
+        int yOffset = 200;
+        int times = 10;
+        for (int i = 0; i < times; i++) {
+            actions.moveByOffset(xOffset, 0)
+                    .moveByOffset(-xOffset, yOffset)
+                    .moveByOffset(xOffset, 0)
+                    .moveByOffset(-xOffset, -yOffset);
+        }
     }
 
     private void drawCoordinates(List<Integer> coordinates) {
@@ -79,18 +112,5 @@ public class MainPageTest {
         }
         actions.build().perform();
     }
-
-
-    @Test
-    public void createMultiGeometryPolygon() {
-        mainPage.multiGeometryPolygonTab.click();
-        drawCoordinates(offsets);
-        dragCoordinate(offsets);
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException ie) {
-        }
-    }
-
 
 }
