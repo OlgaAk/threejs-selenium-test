@@ -1,33 +1,20 @@
 package com.example.test;
 
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.*;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import org.openqa.selenium.interactions.Actions;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 public class MainPageTest {
     private WebDriver driver;
     private MainPage mainPage;
 
-    private List<Integer> offsets  = Arrays.asList(
+    private List<Integer> offsets = Arrays.asList(
             50, 125,
             100, 0,
             100, 20,
@@ -39,17 +26,12 @@ public class MainPageTest {
             -100, -50,
             -100, -50,
             -10, -100
-            );
+    );
 
     @BeforeEach
     public void setUp() {
         System.setProperty("webdriver.chrome.driver", "C:/Users/okokhan/Downloads/chromedriver_win32/chromedriver.exe");
-        var options = new ChromeOptions();
-        LoggingPreferences logPrefs = new LoggingPreferences();
-        logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
-        options.setCapability("goog:loggingPrefs", logPrefs);
-
-        driver = new ChromeDriver(options);
+        driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         driver.get("https://master--vibrant-swartz-f50769.netlify.app/");
@@ -64,7 +46,9 @@ public class MainPageTest {
 
     @AfterEach
     public void tearDown() {
-        getPerformanceLogs();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        Object data = js.executeScript("return window.performance.getEntries();");
+        System.out.println(data.toString());
         try {
             Thread.sleep(10000);
         } catch (InterruptedException ie) {
@@ -72,20 +56,6 @@ public class MainPageTest {
         driver.quit();
     }
 
-    private void getPerformanceLogs() {
-        List<LogEntry> entries = driver.manage().logs().get(LogType.PERFORMANCE).getAll();
-        writeToJson(entries);
-    }
-
-    private void writeToJson(List<LogEntry> logs) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
-        try {
-            writer.writeValue(new File("./performance-logs.json"), logs);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Test
     public void createSingleGeometryPolygon() {
