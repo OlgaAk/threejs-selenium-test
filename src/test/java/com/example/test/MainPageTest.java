@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import org.openqa.selenium.interactions.Actions;
+
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -27,6 +28,7 @@ public class MainPageTest {
             -100, -50,
             -10, -100
     );
+    int count = 0;
 
     @BeforeEach
     public void setUp() {
@@ -49,6 +51,7 @@ public class MainPageTest {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         Object data = js.executeScript("return window.performance.getEntries();");
         System.out.println(data.toString());
+        System.out.println(count);
         try {
             Thread.sleep(10000);
         } catch (InterruptedException ie) {
@@ -96,11 +99,10 @@ public class MainPageTest {
 
     private void drawCoordinates(List<Integer> coordinates) {
         Actions actions = new Actions(driver);
-        int coordsMultiplyBy = 6;
+        int coordsMultiplyBy = 20;
+        // add first point
+        actions.moveByOffset(coordinates.get(0), coordinates.get(1)).click();
         for (int i = 0; i < coordinates.size(); i += 2) {
-            actions
-                    .moveByOffset(coordinates.get(i), coordinates.get(i + 1))
-                    .click();
             addCoordinatesInBetween(i, coordinates, coordsMultiplyBy, actions);
         }
         actions.build().perform();
@@ -112,6 +114,7 @@ public class MainPageTest {
             int y = coordinates.get(i + 3) / coordsMultiplyBy;
             for (int j = 0; j < coordsMultiplyBy; j++) {
                 actions.moveByOffset(x, y).click();
+                count++;
             }
         }
     }
